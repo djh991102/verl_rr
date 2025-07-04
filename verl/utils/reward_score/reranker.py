@@ -1,6 +1,6 @@
 import re
 
-response_pattern = response_pattern = r"^\s*?<think>.*?</think>\s*?<answer>\s*?(\[\d+\](?:\s*>\s*\[\d+\])*)\s*?</answer>\s*?$"
+response_pattern = r"^\s*?<think>.*?</think>.*?(\[\d+\](?:\s*>\s*\[\d+\])*).*?$"
 
 def get_gold_rank(ranked_list: str, ground_truth: str):
     # With proper extraction, expect ranked_list to be of the form [] > ... > []

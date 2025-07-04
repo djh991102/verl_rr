@@ -5,6 +5,9 @@ model_name='Qwen/Qwen3-8B'
 project_name='GRPO-SweRank'
 exp_name="GRPO-SweRank-${model_name}"
 
+NNODES=1
+NGPUS_PER_NODE=4
+
 # Paths
 REPO_PATH="/mnt/nas/jaehyeok/cornstack"
 TRAIN_FILE="${REPO_PATH}/datasets/preprocessed/train.parquet"
@@ -22,7 +25,7 @@ MAX_PROMPT_LEN=20000
 MAX_COMPLETION_LEN=1024
 DATA_ARGS="data.train_files=$TRAIN_FILE \
     data.val_files=$TEST_FILE \
-    data.train_batch_size=1024 \
+    data.train_batch_size=256 \
     data.max_prompt_length=$MAX_PROMPT_LEN \
     data.max_response_length=$MAX_COMPLETION_LEN \
     data.filter_overlong_prompts=True \
@@ -30,7 +33,7 @@ DATA_ARGS="data.train_files=$TRAIN_FILE \
     
 ### ACTOR
 # Actor training arguments
-ACTOR_ARGS="actor_rollout_ref.actor.ppo_mini_batch_size=256 \
+ACTOR_ARGS="actor_rollout_ref.actor.ppo_mini_batch_size=32 \
     actor_rollout_ref.actor.use_dynamic_bsz=True \
     actor_rollout_ref.actor.ppo_max_token_len_per_gpu=$(($MAX_PROMPT_LEN+$MAX_COMPLETION_LEN)) \
     actor_rollout_ref.actor.use_kl_loss=True \
@@ -72,9 +75,9 @@ TRAINER_ARGS="trainer.critic_warmup=0 \
     trainer.project_name=${project_name} \
     trainer.experiment_name=${exp_name} \
     trainer.val_before_train=False \
-    trainer.n_gpus_per_node=8 \
-    trainer.nnodes=1 \
-    trainer.save_freq=8 \
+    trainer.n_gpus_per_node=${NGPUS_PER_NODE} \
+    trainer.nnodes=${NNODES} \
+    trainer.save_freq=10 \
     trainer.test_freq=5 \
     trainer.total_epochs=5 \
     trainer.default_local_dir=${CKPTS_DIR}"
