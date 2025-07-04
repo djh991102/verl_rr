@@ -1,6 +1,7 @@
 import re
 
-response_pattern = r"^\s*?<think>.*?</think>.*?(\[\d+\](?:\s*>\s*\[\d+\])*).*?$"
+response_pattern = r"^\s*?<think>.*?</think>\s*?<answer>\s*?(\[\d+\](?:\s*>\s*\[\d+\])*)\s*?</answer>\s*?$"
+response_pattern_no_answer = r"^\s*?<think>.*?</think>\s*?(\[\d+\](?:\s*>\s*\[\d+\])*)\s*?$"
 
 def get_gold_rank(ranked_list: str, ground_truth: str):
     # With proper extraction, expect ranked_list to be of the form [] > ... > []
@@ -13,7 +14,12 @@ def get_gold_rank(ranked_list: str, ground_truth: str):
 def topk_inverse_rank_score(data_source, solution_str, ground_truth, extra_info=None, k=5):
     solution_str = solution_str.strip()
     ground_truth = ground_truth.strip()
-    match = re.findall(response_pattern, solution_str, re.DOTALL | re.MULTILINE)
+    if "</think>" not in solution_str:
+        return 0
+    if "</answer>" not in solution_str:
+        match = re.findall(response_pattern_no_answer, solution_str, re.DOTALL | re.MULTILINE)
+    else:
+        match = re.findall(response_pattern, solution_str, re.DOTALL | re.MULTILINE)
     if match:
         ranked_list = match[-1]
         # compute inverse rank score if gold within topK else reward with minimal value

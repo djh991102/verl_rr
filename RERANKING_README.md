@@ -41,6 +41,6 @@ bash examples/grpo_trainer/run_grpo_swerank.sh
 
 ### DAPO
 ```bash
-bash recipe/dapo/run_dap_swerank.sh
+bash recipe/dapo/run_dapo_swerank.sh
 ```
 
